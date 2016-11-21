@@ -11,14 +11,19 @@ import calculate.KochManager;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.Callable;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.scene.paint.Color;
 
 /**
  *
  * @author Stefan
  */
-public class EdgeGenerator implements Callable<ArrayList<Edge>>, Observer
+public class EdgeGenerator extends Task<ArrayList<Edge>> implements Observer
 {
     private KochManager kochManager;
     private KochFractal kochFractal;
@@ -39,46 +44,38 @@ public class EdgeGenerator implements Callable<ArrayList<Edge>>, Observer
         this.kochFractal.setLevel(kochFractal.getLevel());
         this.kochFractal.addObserver(this);
         this.stefan = stefan;
+        this.kochFractal.setEdgeGenerator(this);
         
         this.cb = cb;
     }
-        
-//    @Override
-//    public void run()
-//    {
-//        switch(side)
-//        {
-//            case 0:
-//                kochFractal.generateLeftEdge();
-//                break;
-//            case 1:
-//                kochFractal.generateRightEdge();
-//                break;
-//            default:
-//                kochFractal.generateBottomEdge();
-//                break;
-//        }
-//                    
-//    }
-
+  
     @Override
-    public void update(Observable o, Object arg) {
+    public void update(Observable o, Object arg)
+    {
        Edge edge = (Edge) arg;
+       final Edge e2 = new Edge(edge.X1, edge.Y1, edge.X2, edge.Y2, Color.WHITE);
        edges.add(edge);
-//       synchronized(stefan)
-//       {      
-//           kochManager.addEdges(e);
-//           if(kochManager.getEdges().size() == kochFractal.getNrOfEdges())
-//           {
-//                kochManager.getApplication().requestDrawEdges();
-//                kochManager.setDone();
-//                //kochManager.drawEdges();
-//           }
-//       }
+       
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(EdgeGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        Platform.runLater(
+            new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    kochManager.getApplication().drawEdge(e2);
+                }
+            }
+        );
     }
 
     @Override
-    public ArrayList<Edge> call() throws Exception
+    public ArrayList<Edge> call()
     {
         switch(side)
         {
@@ -93,9 +90,26 @@ public class EdgeGenerator implements Callable<ArrayList<Edge>>, Observer
                 break;
         }
         
-        cb.await();
-        return edges;
+        kochManager.addEdges(edges);
+        try {
+            if(cb.await() == 0)
+            {
+                kochManager.getApplication().requestDrawEdges();
+            }
+        } catch (InterruptedException | BrokenBarrierException ex) {
+            Logger.getLogger(EdgeGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning)
+    {
+        kochFractal.cancel();
+        return super.cancel(mayInterruptIfRunning); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
     
 }
