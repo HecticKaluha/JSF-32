@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="JSF32KochFractalFX_Task.jar" size="20136" download="eager" />
+    <jar href="JSF32KochFractalFX_Task.jar" size="23497" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="JSF32KochFractalFX_Task" >
     <param name="requiredFXVersion" value="8.0+"/>

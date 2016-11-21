@@ -3,11 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ThreadManagement;
+package calculate;
 
-import calculate.Edge;
-import calculate.KochFractal;
-import calculate.KochManager;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,6 +22,7 @@ import javafx.scene.paint.Color;
  */
 public class EdgeGenerator extends Task<ArrayList<Edge>> implements Observer
 {
+    
     private KochManager kochManager;
     private KochFractal kochFractal;
     private Object stefan;
@@ -57,7 +55,7 @@ public class EdgeGenerator extends Task<ArrayList<Edge>> implements Observer
        edges.add(edge);
        
         try {
-            Thread.sleep(5);
+            Thread.sleep(5 + side);
         } catch (InterruptedException ex) {
             Logger.getLogger(EdgeGenerator.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -89,15 +87,18 @@ public class EdgeGenerator extends Task<ArrayList<Edge>> implements Observer
                 kochFractal.generateBottomEdge();
                 break;
         }
-        
-        kochManager.addEdges(edges);
-        try {
-            if(cb.await() == 0)
-            {
-                kochManager.getApplication().requestDrawEdges();
-            }
-        } catch (InterruptedException | BrokenBarrierException ex) {
-            Logger.getLogger(EdgeGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        if(!isCancelled())
+        {
+            kochManager.addEdges(edges);
+            try {
+                if(cb.await() == 0)
+                {
+                    kochManager.endCalcTime();
+                    kochManager.getApplication().requestDrawEdges();
+                }
+            } catch (InterruptedException | BrokenBarrierException ex) {
+                Logger.getLogger(EdgeGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            }            
         }
         
         return null;
@@ -108,6 +109,19 @@ public class EdgeGenerator extends Task<ArrayList<Edge>> implements Observer
     {
         kochFractal.cancel();
         return super.cancel(mayInterruptIfRunning); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void updateProgress(double workDone, double max) {
+        super.updateProgress(workDone, max); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public KochManager getKochManager() {
+        return kochManager;
+    }
+
+    public int getSide() {
+        return side;
     }
 
     

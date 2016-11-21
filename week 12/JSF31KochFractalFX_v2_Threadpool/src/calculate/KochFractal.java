@@ -4,8 +4,8 @@
  */
 package calculate;
 
-import ThreadManagement.EdgeGenerator;
 import java.util.Observable;
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 /**
@@ -19,6 +19,7 @@ public class KochFractal extends Observable {
     private float hue;          // Hue value of color for next edge
     private boolean cancelled;  // Flag to indicate that calculation has been cancelled 
     private EdgeGenerator edgeGenerator;
+    private int currentEdgeNo = 0;
     
 
     private void drawKochEdge(double ax, double ay, double bx, double by, int n)
@@ -29,6 +30,35 @@ public class KochFractal extends Observable {
             {
                 hue = hue + 1.0f / nrOfEdges;
                 Edge e = new Edge(ax, ay, bx, by, Color.hsb(hue*360.0, 1.0, 1.0));
+                
+                currentEdgeNo++;
+                edgeGenerator.updateProgress(currentEdgeNo, nrOfEdges / 3);
+                
+                Platform.runLater
+                (
+                    new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            switch (edgeGenerator.getSide()) {
+                                case 0:
+                                    edgeGenerator.getKochManager().getApplication().updateLblNoLeft(currentEdgeNo);
+                                    break;
+                                case 1:
+                                    edgeGenerator.getKochManager().getApplication().updateLblNoRight(currentEdgeNo);
+                                    break;
+                                default:
+                                    edgeGenerator.getKochManager().getApplication().updateLblNoBottom(currentEdgeNo);
+                                    break;
+                            }
+                            
+                        }
+                    }
+                );
+                
+                
+                
                 this.setChanged();
                 this.notifyObservers(e);
             } 

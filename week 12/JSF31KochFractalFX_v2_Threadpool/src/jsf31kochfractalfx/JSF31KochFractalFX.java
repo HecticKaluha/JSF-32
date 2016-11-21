@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -51,6 +52,16 @@ public class JSF31KochFractalFX extends Application {
     private Label labelCalcText;
     private Label labelDraw;
     private Label labelDrawText;
+    private Label labelprogressleft;
+    private Label labelprogressright;
+    private Label labelprogressbottom;
+    private ProgressBar progressbarbottom;
+    private ProgressBar progressbarleft;
+    private ProgressBar progressbarright;
+    private Label lblprogressnoleft;
+    private Label lblprogressnoright;
+    private Label lblprogressnobottom;
+    
     
     // Koch panel and its size
     private Canvas kochPanel;
@@ -130,6 +141,44 @@ public class JSF31KochFractalFX extends Application {
         });
         grid.add(buttonFitFractal, 14, 6);
         
+        
+        //add progressbars
+        labelprogressleft = new Label();
+        labelprogressleft.setText("Progress left: ");
+        progressbarleft = new ProgressBar();
+        
+        lblprogressnoleft = new Label();
+        lblprogressnoleft.setText("");
+        
+        labelprogressright = new Label();
+        labelprogressright.setText("Progress right: ");
+        progressbarright = new ProgressBar();
+        
+        lblprogressnoright = new Label();
+        lblprogressnoright.setText("");
+       
+        labelprogressbottom = new Label();
+        labelprogressbottom.setText("Progress bottom: ");
+        progressbarbottom = new ProgressBar();
+        
+        lblprogressnobottom = new Label();
+        lblprogressnobottom.setText("bhrgr");
+        
+        grid.add(progressbarleft, 5, 7);
+        grid.add(labelprogressleft, 3, 7);
+        grid.add(lblprogressnoleft, 14, 7);
+        
+        grid.add(progressbarright, 5, 8);
+        grid.add(labelprogressright, 3, 8);
+        grid.add(lblprogressnoright, 14, 8);
+        
+        grid.add(progressbarbottom, 5, 9);
+        grid.add(labelprogressbottom, 3, 9);
+        grid.add(lblprogressnobottom, 14, 9);
+        
+        
+        
+        
         // Add mouse clicked event to Koch panel
         kochPanel.addEventHandler(MouseEvent.MOUSE_CLICKED,
             new EventHandler<MouseEvent>() {
@@ -163,7 +212,7 @@ public class JSF31KochFractalFX extends Application {
         
         // Create the scene and add the grid pane
         Group root = new Group();
-        Scene scene = new Scene(root, kpWidth+50, kpHeight+170);
+        Scene scene = new Scene(root, kpWidth+50, kpHeight+300);
         root.getChildren().add(grid);
         
         // Define title and assign the scene for main window
@@ -315,4 +364,35 @@ public class JSF31KochFractalFX extends Application {
         stefan = new Object();
         launch(args);
     }
+
+    public ProgressBar getProgressbarbottom() {
+        return progressbarbottom;
+    }
+
+    public ProgressBar getProgressbarleft() {
+        return progressbarleft;
+    }
+
+    public ProgressBar getProgressbarright() {
+        return progressbarright;
+    }
+    
+    public void updateLblNoLeft(double no)
+    {
+        lblprogressnoleft.setText("" + no);
+    }
+    
+        public void updateLblNoRight(double no)
+    {
+        lblprogressnoright.setText("" + no);
+    }
+        
+    public void updateLblNoBottom(double no)
+    {
+        lblprogressnobottom.setText("" + no);
+    }
+
+
+    
+    
 }

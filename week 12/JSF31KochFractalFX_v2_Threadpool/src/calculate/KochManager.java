@@ -5,7 +5,6 @@
  */
 package calculate;
 
-import ThreadManagement.EdgeGenerator;
 import java.util.ArrayList;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
@@ -67,6 +66,8 @@ public class KochManager
             gen3.cancel(false);
         }
         
+        cb.reset();
+        
         kochFractal1.setLevel(nxt);
         kochFractal2.setLevel(nxt);
         kochFractal3.setLevel(nxt);
@@ -89,6 +90,10 @@ public class KochManager
         gen2 = new EdgeGenerator(1, this, kochFractal1, stefan, cb);
         gen3 = new EdgeGenerator(2, this, kochFractal1, stefan, cb);
         
+        application.getProgressbarleft().progressProperty().bind(gen1.progressProperty());
+        application.getProgressbarright().progressProperty().bind(gen2.progressProperty());
+        application.getProgressbarbottom().progressProperty().bind(gen3.progressProperty());
+        
         timeStampCalc = new TimeStamp();
         timeStampCalc.setBegin("" + (next - 1));
 
@@ -106,8 +111,6 @@ public class KochManager
 //            Logger.getLogger(KochManager.class.getName()).log(Level.SEVERE, null, ex);
 //        }
         
-        timeStampCalc.setEnd("level " + (next));
-        application.setTextCalc(timeStampCalc.toString());
         
         application.requestDrawEdges();
         application.setTextNrEdges("" + kochFractal1.getNrOfEdges());
@@ -136,11 +139,41 @@ public class KochManager
         );
         
         timeStampDraw.setEnd("" + (kochFractal1.getLevel()));
-        application.setTextDraw(timeStampDraw.toString());
+        
+        Platform.runLater
+        (
+            new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    application.setTextDraw(timeStampDraw.toString());
+                }
+            }
+        );
+        
     }
     
     public void addEdges(ArrayList<Edge> edges)
     {
         this.edges.addAll(edges);
+    }
+    
+    public void endCalcTime()
+    {
+        timeStampCalc.setEnd("level " + (next));
+        Platform.runLater
+        (
+            new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    application.setTextCalc(timeStampCalc.toString());
+                }
+            }
+        );
+        
+        
     }
 }
