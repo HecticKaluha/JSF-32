@@ -65,6 +65,8 @@ public class JSF31KochFractalFX extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        
+        
        
         // Define grid pane
         GridPane grid;
@@ -148,6 +150,8 @@ public class JSF31KochFractalFX extends Application {
         primaryStage.setTitle("Koch Fractal");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        readEdges();
     }
     
     public void clearKochPanel() {
@@ -216,9 +220,9 @@ public class JSF31KochFractalFX extends Application {
             double X2 = 0;
             double Y2 = 0;
             
-            int r = 0;
-            int g = 0;
-            int b = 0;
+            double r = 0;
+            double g = 0;
+            double b = 0;
             
             while(scanner.hasNext())
             {
@@ -245,25 +249,27 @@ public class JSF31KochFractalFX extends Application {
                         counter++;
                         break;
                     case 5:
-                        r = Integer.parseInt(scanner.next());
+                        r = Double.parseDouble(scanner.next());
                         counter++;
                         break;
                     case 6:
-                        g = Integer.parseInt(scanner.next());
+                        g = Double.parseDouble(scanner.next());
                         counter++;
                         break;
                     case 7:
-                        b = Integer.parseInt(scanner.next());
+                        b = Double.parseDouble(scanner.next());
                         counter = 1;
                         
                         drawEdge(new Edge(X1, Y1, X2, Y2, new Color(r, g, b, 1.0)));
-                        //edges.add();
-                        
+                        //edges.add();                        
                         break;
-
-                        
-                       
                 }
+
+                if(!scanner.hasNext())
+                {
+                    System.out.println(counter);
+                }
+
             }
             
         } catch (FileNotFoundException ex) {
@@ -330,8 +336,6 @@ public class JSF31KochFractalFX extends Application {
      */
     public static void main(String[] args)
     {
-        readEdges();
-        
         launch(args);
     }
 }

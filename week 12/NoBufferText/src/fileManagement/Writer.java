@@ -22,6 +22,8 @@ public class Writer
     
     public static void main(String[] args)
     {
+        FileWriter fileWriter;
+        
         try
         {
             List<Edge> edges = new ArrayList<>();
@@ -29,15 +31,15 @@ public class Writer
             
             KochFractal kochFractal = new KochFractal();
             
-            //Todo: set lvl instead of hardcoded value
             kochFractal.setLevel(lvl);
             
             edges.addAll(kochFractal.generateBottomEdge());
             edges.addAll(kochFractal.generateLeftEdge());
             edges.addAll(kochFractal.generateRightEdge());
             
-            FileWriter fileWriter = new FileWriter(new File(FILEPATH));
+            fileWriter = new FileWriter(new File(FILEPATH));
             
+            fileWriter.write( System.lineSeparator());
             fileWriter.write(args[0]);
             fileWriter.write( System.lineSeparator());
             
@@ -64,11 +66,16 @@ public class Writer
                 fileWriter.write( System.lineSeparator());
             }
             
+            fileWriter.close();
         }
         catch(Exception exc)
         {
             System.out.println("given level: " + args[0] + "is invalid");
             //System.out.println(exc.getMessage());
+        }
+        finally
+        {
+            
         }
     }
 }
