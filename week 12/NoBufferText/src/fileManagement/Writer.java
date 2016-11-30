@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import timeutil.TimeStamp;
 
 /**
  *
@@ -23,6 +24,7 @@ public class Writer
     public static void main(String[] args)
     {
         FileWriter fileWriter;
+        TimeStamp timeStampWrite;
         
         try
         {
@@ -39,6 +41,8 @@ public class Writer
             
             fileWriter = new FileWriter(new File(FILEPATH));
             
+            timeStampWrite = new TimeStamp();
+            timeStampWrite.setBegin("Schrijven");
             fileWriter.write( System.lineSeparator());
             fileWriter.write(args[0]);
             fileWriter.write( System.lineSeparator());
@@ -67,6 +71,8 @@ public class Writer
             }
             
             fileWriter.close();
+            timeStampWrite.setEnd();
+            System.out.println(timeStampWrite.toString());
         }
         catch(Exception exc)
         {

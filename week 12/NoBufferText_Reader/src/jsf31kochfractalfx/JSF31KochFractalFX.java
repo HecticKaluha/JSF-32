@@ -27,6 +27,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import timeutil.TimeStamp;
 
 /**
  *
@@ -42,6 +43,8 @@ public class JSF31KochFractalFX extends Application {
     private double startPressedY = 0.0;
     private double lastDragX = 0.0;
     private double lastDragY = 0.0;
+    
+    private TimeStamp timeStampRead;// = new TimeStamp();
     
     // Current level of Koch fractal
     private static int currentLevel;
@@ -151,7 +154,11 @@ public class JSF31KochFractalFX extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         
+        timeStampRead = new TimeStamp();
+        timeStampRead.setBegin("Lezen");
         readEdges();
+        timeStampRead.setEnd();
+        System.out.println(timeStampRead.toString());
     }
     
     public void clearKochPanel() {

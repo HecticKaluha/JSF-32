@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import timeutil.TimeStamp;
 
 /**
  *
@@ -24,7 +25,7 @@ public class Writer
     public static void main(String[] args)
     {
         BufferedWriter bufferedWriter;
-        
+        TimeStamp timeStampWrite;
         try
         {
             List<Edge> edges = new ArrayList<>();
@@ -39,6 +40,8 @@ public class Writer
             edges.addAll(kochFractal.generateRightEdge());
             bufferedWriter = new BufferedWriter(new FileWriter(new File(FILEPATH)));
             
+            timeStampWrite = new TimeStamp();
+            timeStampWrite.setBegin("Schrijven");
             bufferedWriter.write(System.lineSeparator());
             bufferedWriter.write(args[0]);
             bufferedWriter.write(System.lineSeparator());
@@ -71,6 +74,8 @@ public class Writer
             }
             
             bufferedWriter.close();
+            timeStampWrite.setEnd();
+            System.out.println(timeStampWrite.toString());
         }
         catch(Exception exc)
         {

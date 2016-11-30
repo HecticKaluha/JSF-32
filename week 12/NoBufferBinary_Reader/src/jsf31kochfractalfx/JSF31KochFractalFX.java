@@ -31,6 +31,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import timeutil.TimeStamp;
 
 /**
  *
@@ -59,6 +60,8 @@ public class JSF31KochFractalFX extends Application {
     private Label labelCalcText;
     private Label labelDraw;
     private Label labelDrawText;
+    
+    private TimeStamp timeStampRead;// = new TimeStamp();
     
     // Koch panel and its size
     private static Canvas kochPanel;
@@ -155,7 +158,11 @@ public class JSF31KochFractalFX extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         
+        timeStampRead = new TimeStamp();
+        timeStampRead.setBegin("Lezen");
         readEdges();
+        timeStampRead.setEnd();
+        System.out.println(timeStampRead.toString());
     }
     
     public void clearKochPanel() {

@@ -15,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import timeutil.TimeStamp;
 
 /**
  *
@@ -27,9 +28,10 @@ public class Writer
     public static void main(String[] args)
     {
         ObjectOutputStream objectOutputStream;
-        
+        TimeStamp timeStampWrite;
         try
         {
+            
             List<Edge> edges = new ArrayList<>();
             int lvl = Integer.parseInt(args[0]);
             
@@ -42,10 +44,16 @@ public class Writer
             edges.addAll(kochFractal.generateRightEdge());
             
             objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(FILEPATH))));
-
+            
+            timeStampWrite = new TimeStamp();
+            timeStampWrite.setBegin("Schrijven");
             objectOutputStream.writeInt(kochFractal.getLevel());
+            
 
             objectOutputStream.writeObject(edges);
+            
+            timeStampWrite.setEnd();
+            System.out.println(timeStampWrite.toString());
             
             objectOutputStream.close();
         }
