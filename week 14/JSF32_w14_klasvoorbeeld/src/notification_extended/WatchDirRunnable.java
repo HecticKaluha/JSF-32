@@ -56,8 +56,7 @@ public class WatchDirRunnable implements Runnable {
     private void register(Path dir) throws IOException {
 
         WatchKey key = dir.register(this.watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        if (trace)
-        {
+        if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
                 System.out.format("register: %s\n", dir);
@@ -91,8 +90,7 @@ public class WatchDirRunnable implements Runnable {
      * Process all events for keys queued to the watcher.
      */
     public void run() {
-        for (;;)
-        {
+        for (;;) {
 
             // wait for key to be signalled
             WatchKey key;
@@ -126,21 +124,6 @@ public class WatchDirRunnable implements Runnable {
                 // Path filename = (Path) event.context();
                 // this leads to the same result as ev.context() below
                 
-                
-                if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY)
-                    {
-                        System.out.println(child + " created");
-                        Platform.runLater
-                        (
-                                new Runnable()
-                                {
-                                    public void run()
-                                    {
-                                        readEdges();
-                                    }
-                                }
-                        )
-                    }
                 
                 // print out event
                 System.out.format("%s: %s\n", event.kind().name(), child);
