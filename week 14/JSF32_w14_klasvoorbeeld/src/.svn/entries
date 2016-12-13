@@ -1,0 +1,98 @@
+10
+
+dir
+240
+https://fontysbak/svn/JAVA/trunk/JSF/JSF32_w3_klasvoorbeeld/src
+https://fontysbak/svn/JAVA
+
+
+
+2012-11-20T16:02:05.890625Z
+240
+Erik_van_der_Schriek
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+d9b37857-89d7-e645-9f93-a0cac0d2c454
+
+
+
+
+
+
+0
+
+filelocking
+dir
+
+
+
+delete
+
+filelocking_3
+dir
+
+
+
+add
+
+notification
+dir
+
+
+
+delete
+
+notification_4
+dir
+
+
+
+add
+
+notification_simple
+dir
+
+
+
+add
+
+randomacces
+dir
+
+
+
+delete
+
+randomacces_1
+dir
+
+
+
+add
+
+sharingmemorymappedfile
+dir
+
+
+
+delete
+
+sharingmemorymappedfile_2
+dir
+
+
+
+add
+
