@@ -1,4 +1,4 @@
-package notification_extended;
+package Runnables;
 
 import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -6,6 +6,9 @@ import static java.nio.file.LinkOption.*;
 import java.nio.file.attribute.*;
 import java.io.*;
 import java.util.*;
+import javafx.application.Application;
+import javafx.application.Platform;
+import jsf31kochfractalfx.JSF31KochFractalFX;
 
 /**
  * Example to watch a directory (or tree) for changes to files.
@@ -16,15 +19,17 @@ public class WatchDirRunnable implements Runnable {
     private final Map<WatchKey, Path> keys; // the map of WatchKey's and belonging Path
     private final boolean recursive;
     private boolean trace = false;
+    private JSF31KochFractalFX application = null;
 
     /**
      * Creates a WatchService and registers the given directory
      */
-    WatchDirRunnable(Path dir, boolean recursive) throws IOException {
+    public WatchDirRunnable(Path dir, boolean recursive, JSF31KochFractalFX application) throws IOException {
         // create a default WatchService
         this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey, Path>();  // map of watchkeys and path belonging to it
         this.recursive = recursive;
+        this.application = application;
 
         // register all Paths to watch
         if (recursive) {
@@ -55,12 +60,14 @@ public class WatchDirRunnable implements Runnable {
      */
     private void register(Path dir) throws IOException {
 
-        WatchKey key = dir.register(this.watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+        WatchKey key = dir.register(this.watcher, ENTRY_CREATE, ENTRY_MODIFY);
         if (trace)
         {
             Path prev = keys.get(key);
             if (prev == null) {
                 System.out.format("register: %s\n", dir);
+                
+                
             } else {
                 if (!dir.equals(prev)) {
                     System.out.format("update: %s -> %s\n", prev, dir);
@@ -96,11 +103,11 @@ public class WatchDirRunnable implements Runnable {
 
             // wait for key to be signalled
             WatchKey key;
-            try {
-                key = watcher.take();
-            } catch (InterruptedException x) {
-                return;
-            }
+//            try {
+                key = watcher.poll();
+//            } catch (InterruptedException x) {
+//                return;
+//            }
 
             Path dir = keys.get(key);
             if (dir == null) {
@@ -136,10 +143,10 @@ public class WatchDirRunnable implements Runnable {
                                 {
                                     public void run()
                                     {
-                                        readEdges();
+                                        application.readEdges();
                                     }
                                 }
-                        )
+                        );
                     }
                 
                 // print out event

@@ -4,6 +4,7 @@
  */
 package jsf31kochfractalfx;
 
+import Runnables.WatchDirRunnable;
 import edgeManagement.Edge;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +16,15 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -72,9 +82,11 @@ public class JSF31KochFractalFX extends Application {
     private final int kpWidth = 500;
     private final int kpHeight = 500;
     
-    private final static String PATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 14\\edges\\edges.bin";
+    private final static String DIRPATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 14\\edges\\";
+    private final static String FILEPATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 14\\edges\\edges.bin";
     private final static int INTBYTESIZE = 4;
     private final static int EDGEBYTESIZE = 56;
+    private WatchDirRunnable thread;
     
     @Override
     public void start(Stage primaryStage) {
@@ -166,7 +178,13 @@ public class JSF31KochFractalFX extends Application {
         
         timeStampRead = new TimeStamp();
         timeStampRead.setBegin("Lezen");
-        readEdges();
+        try {
+            thread = new WatchDirRunnable(Paths.get(DIRPATH), false, this);
+            thread.run();
+        } catch (IOException ex) {
+            Logger.getLogger(JSF31KochFractalFX.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         timeStampRead.setEnd();
         System.out.println(timeStampRead.toString());
     }
@@ -244,7 +262,7 @@ public class JSF31KochFractalFX extends Application {
             double g = 0;
             double b = 0;
             
-            raf = new RandomAccessFile(PATH, "rw");
+            raf = new RandomAccessFile(FILEPATH, "rw");
             ch = raf.getChannel();
             out = ch.map(FileChannel.MapMode.READ_ONLY, 0, INTBYTESIZE);
             
@@ -302,6 +320,55 @@ public class JSF31KochFractalFX extends Application {
     {
         return (int) (3 * Math.pow(4, lvl - 1));
     }
+    
+//    private static void watchFile()
+//    {
+//        final WatchService watcher;
+//        // Voorbeelden van interessante locaties
+//        // Path dir = Paths.get("D:\\");
+//        Path dir = Paths.get(DIRPATH);
+//        WatchKey key;
+//
+//        try {
+//            watcher = FileSystems.getDefault().newWatchService();
+//            dir.register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
+//            
+//            boolean blub = false;
+//            
+//            while (true)
+//            {
+//                key = watcher.take();
+//                for (WatchEvent<?> event : key.pollEvents())
+//                {
+//                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
+//                    
+//                    Path filename = ev.context();
+//                    Path child = dir.resolve(filename);
+//                    
+//                    WatchEvent.Kind kind = ev.kind();
+//                    if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY)
+//                    {
+//                        System.out.println(child + " created");
+//                        readEdges();
+//                        blub  = true;
+//                    }
+//                }
+//                
+//                key.reset();
+//                
+//                if(blub)
+//                {
+//                    break;
+//                }
+//            }
+//
+//        } catch (IOException | InterruptedException ex) {
+//            System.out.println("exception: " + ex.getMessage());
+//        }
+//        
+//        System.out.println("blub");
+//    }
+    
 
     
     private void fitFractalButtonActionPerformed(ActionEvent event) {
