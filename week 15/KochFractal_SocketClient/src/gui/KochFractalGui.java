@@ -109,9 +109,9 @@ public class KochFractalGui extends Application
         // Labels to present number of edges for Koch fractal
         labelNrEdges = new Label("Nr edges:");
         labelNrEdgesText = new Label();
-        grid.add(labelNrEdges, 0, 0, 4, 1);
+        grid.add(labelNrEdges, 0, 0, 4, 1);        
+
         grid.add(labelNrEdgesText, 3, 0, 22, 1);
-        
         // Labels to present time of calculation for Koch fractal
         labelCalc = new Label("Calculating:");
         labelCalcText = new Label();
@@ -143,7 +143,9 @@ public class KochFractalGui extends Application
         kochPanel.addEventHandler(MouseEvent.MOUSE_CLICKED,
             new EventHandler<MouseEvent>() {
                 @Override
-                public void handle(MouseEvent event) {
+                public void handle(MouseEvent event)
+                {
+                    System.out.println("CLICK");
                     kochPanelMouseClicked(event);
                 }
             });
@@ -238,23 +240,41 @@ public class KochFractalGui extends Application
 //        
 //    }
     
+    private static Edge edgeAfterZoomAndDrag(Edge e) {
+        return new Edge(
+                e.X1 * zoom + zoomTranslateX,
+                e.Y1 * zoom + zoomTranslateY,
+                e.X2 * zoom + zoomTranslateX,
+                e.Y2 * zoom + zoomTranslateY,
+                e.color);
+    }
+
     
     private void fitFractalButtonActionPerformed(ActionEvent event) {
         resetZoom();
     }
     
     private void kochPanelMouseClicked(MouseEvent event) {
-        if (Math.abs(event.getX() - startPressedX) < 1.0 && 
-            Math.abs(event.getY() - startPressedY) < 1.0) {
+        System.out.println("ZOOM");
+        
+        if (Math.abs(event.getX() - startPressedX) < 1.0 && Math.abs(event.getY() - startPressedY) < 1.0)
+        {
             double originalPointClickedX = (event.getX() - zoomTranslateX) / zoom;
             double originalPointClickedY = (event.getY() - zoomTranslateY) / zoom;
-            if (event.getButton() == MouseButton.PRIMARY) {
+        
+            if (event.getButton() == MouseButton.PRIMARY)
+            {
                 zoom *= 2.0;
-            } else if (event.getButton() == MouseButton.SECONDARY) {
+            }
+            else if (event.getButton() == MouseButton.SECONDARY)
+            {
                 zoom /= 2.0;
             }
+            
             zoomTranslateX = (int) (event.getX() - originalPointClickedX * zoom);
             zoomTranslateY = (int) (event.getY() - originalPointClickedY * zoom);
+            
+            clientManager.zoom(zoom, zoomTranslateX, zoomTranslateY);
         }
     }                                      
 
@@ -277,17 +297,5 @@ public class KochFractalGui extends Application
         zoom = kpSize;
         zoomTranslateX = (kpWidth - kpSize) / 2.0;
         zoomTranslateY = (kpHeight - kpSize) / 2.0;
-    }
-
-    private static Edge edgeAfterZoomAndDrag(Edge e)
-    {
-        return new Edge
-        (
-            e.X1 * zoom + zoomTranslateX,
-            e.Y1 * zoom + zoomTranslateY,
-            e.X2 * zoom + zoomTranslateX,
-            e.Y2 * zoom + zoomTranslateY,
-            e.color
-        );
     }
 }
