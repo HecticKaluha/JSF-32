@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package jsf31kochfractalfx;
+package gui;
 
-import edgeManagement.Edge;
+import edges.Edge;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,13 +32,13 @@ import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import timeutil.TimeStamp;
+import utils.TimeStamp;
 
 /**
  *
  * @author Nico Kuijpers
  */
-public class JSF31KochFractalFX extends Application {
+public class KochFractalGui extends Application {
     
     // Zoom and drag
     private static double zoomTranslateX = 0.0;
@@ -230,9 +230,9 @@ public class JSF31KochFractalFX extends Application {
             }
             
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(JSF31KochFractalFX.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KochFractalGui.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(JSF31KochFractalFX.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KochFractalGui.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

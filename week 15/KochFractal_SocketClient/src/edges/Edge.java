@@ -3,9 +3,10 @@
  * and open the template in the editor.
  */
 
-package edgeManagement;
+package edges;
 
 import java.io.Serializable;
+import utils.SerializableColor;
 
 /**
  *

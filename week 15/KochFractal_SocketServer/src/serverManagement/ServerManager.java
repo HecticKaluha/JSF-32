@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package edgeManagement;
+package serverManagement;
 
+import edges.Edge;
+import utils.SerializableColor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -13,7 +15,7 @@ import javafx.scene.paint.Color;
  *
  * @author Peter Boots
  */
-public class KochFractal extends Observable {
+public class ServerManager extends Observable {
 
     private int level = 1;      // The current level of the fractal
     private int nrOfEdges = 3;  // The number of edges in the current level of the fractal

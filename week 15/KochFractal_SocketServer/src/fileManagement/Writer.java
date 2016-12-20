@@ -5,8 +5,8 @@
  */
 package fileManagement;
 
-import edgeManagement.Edge;
-import edgeManagement.KochFractal;
+import edges.Edge;
+import serverManagement.ServerManager;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,7 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import timeutil.TimeStamp;
+import utils.TimeStamp;
 
 /**
  *
@@ -35,7 +35,7 @@ public class Writer
             List<Edge> edges = new ArrayList<>();
             int lvl = Integer.parseInt(args[0]);
             
-            KochFractal kochFractal = new KochFractal();
+            ServerManager kochFractal = new ServerManager();
             
             kochFractal.setLevel(lvl);
             

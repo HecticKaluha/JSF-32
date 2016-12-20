@@ -1,4 +1,4 @@
-package edgeManagement;
+package utils;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.NumberUtils;
