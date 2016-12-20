@@ -1,0 +1,67 @@
+package clientserver_objectstreams_3;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class ObjectStreamServer {
+
+	public static void main(String[] args) {
+		try {
+			// establish server socket
+			ServerSocket s = new ServerSocket(8189);
+
+			// wait for client connection
+			Socket incoming = s.accept();
+			System.out.println("Connected");
+			try {
+				OutputStream outStream = incoming.getOutputStream();
+				InputStream inStream = incoming.getInputStream();
+ 
+				ObjectInputStream in = new ObjectInputStream(inStream);
+				ObjectOutputStream out = new ObjectOutputStream(outStream);
+
+				out.writeObject("Hello! Enter BYE to exit.");
+				out.flush();
+ 
+				// echo client Object input
+				boolean done = false;
+				Object inObject = null;
+				while (!done) {
+					try {
+						inObject = in.readObject();
+						if (inObject instanceof Persoon) {
+							// change name
+							Persoon mens = (Persoon) inObject;
+							System.out.println("Persoon ontvangen: "
+									+ mens.toString());
+							mens.naam += "_checked";
+							out.writeObject(mens);
+							out.flush();
+						} else if (inObject instanceof String) {
+							String woord = (String) inObject;
+							System.out.println("String ontvangen: "+woord);
+							if (woord.equals("BYE"))
+								done = true;
+							out.writeObject(woord);
+							out.flush();
+						}
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						System.out.println("Object type not known");
+					}
+					//
+				}
+			} finally {
+				incoming.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+}

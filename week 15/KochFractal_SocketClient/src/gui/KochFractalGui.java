@@ -4,21 +4,12 @@
  */
 package gui;
 
+import edges.ClientManager;
 import edges.Edge;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Random;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -27,7 +18,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -38,8 +28,8 @@ import utils.TimeStamp;
  *
  * @author Nico Kuijpers
  */
-public class KochFractalGui extends Application {
-    
+public class KochFractalGui extends Application
+{    
     // Zoom and drag
     private static double zoomTranslateX = 0.0;
     private static double zoomTranslateY = 0.0;
@@ -52,7 +42,6 @@ public class KochFractalGui extends Application {
     private TimeStamp timeStampRead;// = new TimeStamp();
     //private TimeStamp timeStampDraw = new TimeStamp();
     // Current level of Koch fractal
-    private static int currentLevel;
     private static List<Edge> edges = new ArrayList<>();
     
     // Labels for level, nr edges, calculation time, and drawing time
@@ -69,13 +58,43 @@ public class KochFractalGui extends Application {
     private final int kpWidth = 500;
     private final int kpHeight = 500;
     
-    private final static String PATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 12\\edges.bin";
+//    private final static String PATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 12\\edges.bin";
+    private static int currentLevel = 9;
+    private static boolean individual = false;
+    private static String serverIP = "localhost";
+    
+    private ClientManager clientManager;
+
+        /**
+     * The main() method is ignored in correctly deployed JavaFX application.
+     * main() serves only as fallback in case the application can not be
+     * launched through deployment artifacts, e.g., in IDEs with limited FX
+     * support. NetBeans ignores main().
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args)
+    {
+//        try
+//        {
+//            currentLevel = Integer.parseInt(args[0]);
+//            individual = Boolean.parseBoolean(args[1]);
+//            serverIP = args[2];
+//        }
+//        catch(NumberFormatException exception)
+//        {
+//            currentLevel = 0;
+//        }
+//        
+        launch(args);
+    }
     
     @Override
-    public void start(Stage primaryStage) {
-        
-        
-       
+    public void start(Stage primaryStage)
+    {
+        Random random = new Random();
+        currentLevel = random.nextInt(7);
+        currentLevel++;
         // Define grid pane
         GridPane grid;
         grid = new GridPane();
@@ -159,11 +178,14 @@ public class KochFractalGui extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         
-        timeStampRead = new TimeStamp();
-        timeStampRead.setBegin("Lezen");
-        readEdges();
-        timeStampRead.setEnd();
-        System.out.println(timeStampRead.toString());
+//        timeStampRead = new TimeStamp();
+//        timeStampRead.setBegin("Lezen");
+//        readEdges();
+//        timeStampRead.setEnd();
+//        System.out.println(timeStampRead.toString());
+
+        clientManager = new ClientManager(serverIP, this);
+        clientManager.requestEdges(currentLevel, individual);
     }
     
     public void clearKochPanel() {
@@ -173,7 +195,7 @@ public class KochFractalGui extends Application {
         gc.fillRect(0.0,0.0,kpWidth,kpHeight);
     }
     
-    public static void drawEdge(Edge e) {
+    public void drawEdge(Edge e) {
         // Graphics
         GraphicsContext gc = kochPanel.getGraphicsContext2D();
         
@@ -216,25 +238,6 @@ public class KochFractalGui extends Application {
 //        
 //    }
     
-    public static void readEdges()
-    {
-        try
-        {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(new File(PATH))));
-                        
-            int lvl = objectInputStream.readInt();
-            
-            for(Edge edge : (List<Edge>) objectInputStream.readObject())
-            {
-                drawEdge(edge);
-            }
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(KochFractalGui.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(KochFractalGui.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     private void fitFractalButtonActionPerformed(ActionEvent event) {
         resetZoom();
@@ -276,25 +279,15 @@ public class KochFractalGui extends Application {
         zoomTranslateY = (kpHeight - kpSize) / 2.0;
     }
 
-    private static Edge edgeAfterZoomAndDrag(Edge e) {
-        return new Edge(
-                e.X1 * zoom + zoomTranslateX,
-                e.Y1 * zoom + zoomTranslateY,
-                e.X2 * zoom + zoomTranslateX,
-                e.Y2 * zoom + zoomTranslateY,
-                e.color);
-    }
-
-    /**
-     * The main() method is ignored in correctly deployed JavaFX application.
-     * main() serves only as fallback in case the application can not be
-     * launched through deployment artifacts, e.g., in IDEs with limited FX
-     * support. NetBeans ignores main().
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args)
+    private static Edge edgeAfterZoomAndDrag(Edge e)
     {
-        launch(args);
+        return new Edge
+        (
+            e.X1 * zoom + zoomTranslateX,
+            e.Y1 * zoom + zoomTranslateY,
+            e.X2 * zoom + zoomTranslateX,
+            e.Y2 * zoom + zoomTranslateY,
+            e.color
+        );
     }
 }

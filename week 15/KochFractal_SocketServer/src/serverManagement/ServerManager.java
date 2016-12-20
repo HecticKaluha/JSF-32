@@ -1,96 +1,141 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package serverManagement;
 
 import edges.Edge;
-import utils.SerializableColor;
+import edges.KochFractal;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import javafx.scene.paint.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
- * @author Peter Boots
+ * @author Stefan
  */
-public class ServerManager extends Observable {
-
-    private int level = 1;      // The current level of the fractal
-    private int nrOfEdges = 3;  // The number of edges in the current level of the fractal
-    private float hue;          // Hue value of color for next edge
-    private List<Edge> edges = new ArrayList<>();
+public class ServerManager
+{
+    private static ServerSocket serverSocket;
+    private String serverIP;
     
-
-    private void drawKochEdge(double ax, double ay, double bx, double by, int n)
+    public static void main(String[] args)
     {
-            if (n == 1) 
+        try
+        {
+            serverSocket = new ServerSocket(8189);
+            
+            while(true)
             {
-                hue = hue + 1.0f / nrOfEdges;
+                System.out.println("waiting for connection");
+                Socket socket = serverSocket.accept();
                 
-                javafx.scene.paint.Color color = javafx.scene.paint.Color.hsb(hue*360.0, 1.0, 1.0);
+                Thread thread = new Thread
+                (
+                    new Runnable()
+                    {
+                        private ObjectInputStream objectInputStream;
+                        private ObjectOutputStream objectOutputStream;
+                        private KochFractal kochFractal;
+
+                        private List<Edge> edges = new ArrayList<>();
+
+                        @Override
+                        public void run()
+                        {
+                            System.out.println("Start reading");
+                            try
+                            {
+                                objectInputStream = new ObjectInputStream(socket.getInputStream());
+                                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+
+                                System.out.println("waiting for data");
+                                Object data = objectInputStream.readObject();
+                                System.out.println((String) data);
+
+                                if(data.getClass() == String.class)
+                                {
+                                    String text = (String) data;
+
+                                    int lvl = Integer.parseInt(text.substring(0, text.indexOf("|")));
+                                    System.out.println("LVL: " + lvl);
+                                    boolean individual = Boolean.parseBoolean(text.substring(text.indexOf("|") + 1, text.length()));
+                                    System.out.println(text.substring(text.indexOf("|") + 1, text.length() - 1));
+                                    System.out.println("Individual: " + individual);
+
+                                    kochFractal = new KochFractal(lvl, individual, objectOutputStream);
+
+                                    System.out.println("start calculation");
+                                    edges.addAll(kochFractal.generateBottomEdge());
+                                    edges.addAll(kochFractal.generateLeftEdge());
+                                    edges.addAll(kochFractal.generateRightEdge());
+                                    System.out.println("end calculation");
+
+                                    if(!individual)
+                                    {
+                                        System.out.println("send LIST edge");
+                                        objectOutputStream.writeObject(edges);
+                                    }
+                                }
+                            }
+                            catch (IOException | ClassNotFoundException ex)
+                            {
+                                System.out.println("#Failure");
+                                Logger.getLogger(ServerManager.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                );
                 
-                edges.add(new Edge(ax, ay, bx, by, new SerializableColor((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue(), 1.0f)));  
-            } 
-            else
-            {
-                double angle = Math.PI / 3.0 + Math.atan2(by - ay, bx - ax);
-                double distabdiv3 = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) / 3;
-                double cx = Math.cos(angle) * distabdiv3 + (bx - ax) / 3 + ax;
-                double cy = Math.sin(angle) * distabdiv3 + (by - ay) / 3 + ay;
-                final double midabx = (bx - ax) / 3 + ax;
-                final double midaby = (by - ay) / 3 + ay;
-                drawKochEdge(ax, ay, midabx, midaby, n - 1);
-                drawKochEdge(midabx, midaby, cx, cy, n - 1);
-                drawKochEdge(cx, cy, (midabx + bx) / 2, (midaby + by) / 2, n - 1);
-                drawKochEdge((midabx + bx) / 2, (midaby + by) / 2, bx, by, n - 1);
+                thread.start();
             }
-    }
-
-    public List<Edge> generateLeftEdge() 
-    {
-        edges.clear();
+        } catch (IOException ex)
+        {
+            Logger.getLogger(ServerManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        hue = 0f;
-        drawKochEdge(0.5, 0.0, (1 - Math.sqrt(3.0) / 2.0) / 2, 0.75, level);
-        
-        return edges;
+        try
+        {       
+//            List<Edge> edges = new ArrayList<>();
+//            int lvl = Integer.parseInt(args[0]);
+//            
+//            KochFractal kochFractal = new KochFractal();
+//            
+//            kochFractal.setLevel(lvl);
+//            
+//            edges.addAll(kochFractal.generateBottomEdge());
+//            edges.addAll(kochFractal.generateLeftEdge());
+//            edges.addAll(kochFractal.generateRightEdge());
+//            
+//            objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(FILEPATH))));
+//            
+//            timeStampWrite = new TimeStamp();
+//            timeStampWrite.setBegin("Schrijven");
+//            objectOutputStream.writeInt(kochFractal.getLevel());
+//            
+//
+//            objectOutputStream.writeObject(edges);
+//            
+//            timeStampWrite.setEnd();
+//            System.out.println(timeStampWrite.toString());
+//            
+//            objectOutputStream.close();
+        }
+        catch(Exception exc)
+        {
+            System.out.println("given level: " + args[0] + "is invalid");
+            System.out.println(exc.getMessage());
+        }
+        finally
+        {
+            
+        }
     }
-
-    public List<Edge> generateBottomEdge() 
-    {
-        edges.clear();
-        
-        hue = 1f / 3f;
-        drawKochEdge((1 - Math.sqrt(3.0) / 2.0) / 2, 0.75, (1 + Math.sqrt(3.0) / 2.0) / 2, 0.75, level);
-        
-        return edges;
-    }
-
-    public  List<Edge> generateRightEdge() 
-    {
-        edges.clear();
-        
-        hue = 2f / 3f;
-        drawKochEdge((1 + Math.sqrt(3.0) / 2.0) / 2, 0.75, 0.5, 0.0, level);
-        
-        return edges;
-    }
-    
-    public void setLevel(int lvl) 
-    {
-        level = lvl;
-        nrOfEdges = (int) (3 * Math.pow(4, level - 1));
-    }
-
-    public int getLevel() 
-    {
-        return level;
-    }
-
-    public int getNrOfEdges() 
-    {
-        return nrOfEdges;
-    }    
 }
