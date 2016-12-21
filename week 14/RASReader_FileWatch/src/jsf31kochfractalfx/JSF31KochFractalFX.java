@@ -197,6 +197,7 @@ public class JSF31KochFractalFX extends Application {
     }
     
     public static void drawEdge(Edge e) {
+        System.out.println("drawEdge called");
         // Graphics
         GraphicsContext gc = kochPanel.getGraphicsContext2D();
         
@@ -239,8 +240,9 @@ public class JSF31KochFractalFX extends Application {
 //        
 //    }
     
-    public static void readEdges()
+    public static void readEdges(File filePath)
     {
+        System.out.println("readEdges called with file: " + filePath.getPath());
         RandomAccessFile raf = null;
         FileChannel ch = null;
         MappedByteBuffer out = null;
@@ -250,7 +252,7 @@ public class JSF31KochFractalFX extends Application {
         {
             int counter = 0;
             
-            int lvl = 0;
+            //int lvl = 0;
             
             double X1 = 0;
             double Y1 = 0;
@@ -262,17 +264,17 @@ public class JSF31KochFractalFX extends Application {
             double g = 0;
             double b = 0;
             
-            raf = new RandomAccessFile(FILEPATH, "rw");
+            raf = new RandomAccessFile(filePath, "rw");
             ch = raf.getChannel();
             out = ch.map(FileChannel.MapMode.READ_ONLY, 0, INTBYTESIZE);
             
             sharedLock = ch.lock(0, INTBYTESIZE, true);
             out.position(0);
-            lvl = out.getInt();
+            currentLevel = out.getInt();
             sharedLock.release();
-            out = ch.map(FileChannel.MapMode.READ_ONLY, INTBYTESIZE, getNrOfEdges(lvl) * EDGEBYTESIZE);
+            out = ch.map(FileChannel.MapMode.READ_ONLY, INTBYTESIZE, getNrOfEdges(currentLevel) * EDGEBYTESIZE);
             
-            for(int i = 0; i < getNrOfEdges(lvl); i++)
+            for(int i = 0; i < getNrOfEdges(currentLevel); i++)
             {
                 sharedLock = ch.lock(i * EDGEBYTESIZE + 5, EDGEBYTESIZE, true);
                 X1 = out.getDouble();
@@ -292,6 +294,7 @@ public class JSF31KochFractalFX extends Application {
         }
         catch (FileNotFoundException ex)
         {
+            ex.printStackTrace();
             System.out.println("FileNotFOundException: " + ex.getMessage());
         } 
         catch (IOException ex)
@@ -309,9 +312,9 @@ public class JSF31KochFractalFX extends Application {
 
                 ch.close();
                 raf.close();
-            } catch (IOException ex)
+            } catch (Exception ex)
             {
-                System.out.println("IOExceptionException (laatste): " + ex.getMessage());
+                System.out.println("ExceptionException (laatste): " + ex.getMessage());
             }            
         }
     }

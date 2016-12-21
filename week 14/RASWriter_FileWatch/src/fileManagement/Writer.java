@@ -116,9 +116,12 @@ public class Writer
                 raf.close();
                 Cleaner cleaner = ((sun.nio.ch.DirectBuffer)out).cleaner();
                 cleaner.clean();
-                File file2 = new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + "BLUB" + ".bin");
+                //Files.delete(new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + "BLUB" + ".bin").toPath());
+                File file2 = new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + new GregorianCalendar().getTimeInMillis() + ".bin");
+                //Files.delete(file2.toPath());
                 System.out.println("Result of move:"+ file.renameTo(file2));
                //Files.move(file.toPath(), new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + "BLUB" + ".bin").toPath());
+               //Files.delete(file.toPath());
             } catch (Exception ex) {
                 Logger.getLogger(Writer.class.getName()).log(Level.SEVERE, null, ex);
             }

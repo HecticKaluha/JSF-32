@@ -62,10 +62,14 @@ public class WatchDirRunnable implements Runnable {
      */
     private void register(Path dir) throws IOException {
 
+        
+        
         WatchKey key = dir.register(this.watcher, ENTRY_CREATE, ENTRY_MODIFY);
+        System.out.println(key + " registered on " + dir);
         if (trace)
         {
             Path prev = keys.get(key);
+            System.out.println(prev + " get from " + key);
             if (prev == null) {
                 System.out.format("register: %s\n", dir);
                 
@@ -77,6 +81,7 @@ public class WatchDirRunnable implements Runnable {
             }
         }
         keys.put(key, dir);
+        System.out.println(key + "put to map");
     }
 
     /**
@@ -108,6 +113,7 @@ public class WatchDirRunnable implements Runnable {
             try {
                 //            try {
                 key = watcher.take();
+                System.out.println(key + "taken from watcher");
 //            } catch (InterruptedException x) {
 //                return;
 //            }
@@ -116,12 +122,14 @@ public class WatchDirRunnable implements Runnable {
             }
 
             Path dir = keys.get(key);
+            System.out.println(dir.toString() + "got path from map");
             if (dir == null) {
                 System.err.println("WatchKey not recognized!!");
                 continue;
             }
 
-            for (WatchEvent<?> event : key.pollEvents()) {
+            for (WatchEvent<?> event : key.pollEvents())
+            {
                 // get event kind
                 WatchEvent.Kind kind = event.kind();
 
@@ -133,41 +141,45 @@ public class WatchDirRunnable implements Runnable {
                 // Context for directory entry event is the file name of entry
                 WatchEvent<Path> ev = cast(event);
                 Path filename = ev.context();
-                Path child = dir.resolve(filename);
+                final Path child = dir.resolve(filename);
 
-                // or you could use: 
-                // Path filename = (Path) event.context();
-                // this leads to the same result as ev.context() below
-                
-                
-                if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY)
-                    {
-                        System.out.println(child + " created");
-                        Platform.runLater
-                        (
-                                new Runnable()
-                                {
-                                    public void run()
-                                    {
-                                        application.readEdges();
-                                    }
-                                }
-                        );
-                    }
-                
-                // print out event
-                System.out.format("%s: %s\n", event.kind().name(), child);
+                if(!child.toString().equals("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges.bin"))
+                {
+                    // or you could use: 
+                    // Path filename = (Path) event.context();
+                    // this leads to the same result as ev.context() below
 
-                // if directory is created, and watching recursively, then
-                // register it and its sub-directories
-                if (recursive && (kind == ENTRY_CREATE)) {
-                    try {
-                        if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
-                            registerAll(child);
+                    if (kind == ENTRY_CREATE || kind == ENTRY_MODIFY)
+                        {
+                            System.out.println("event kind is create or modify");
+                            //System.out.println(child + " created");
+    //                        Platform.runLater
+    //                        (
+    //                                new Runnable()
+    //                                {
+    //                                    @Override
+    //                                    public void run()
+    //                                    {
+                                            application.readEdges(child.getFileName().toFile());
+    //                                    }
+    //                                }
+    //                        );
                         }
-                    } catch (IOException x) {
-                        // ignore to keep sample readable
-                    }
+
+                    // print out event
+                    System.out.format("%s: %s\n", event.kind().name(), child);
+
+                    // if directory is created, and watching recursively, then
+                    // register it and its sub-directories
+                    if (recursive && (kind == ENTRY_CREATE)) {
+                        try {
+                            if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
+                                registerAll(child);
+                            }
+                        } catch (IOException x) {
+                            // ignore to keep sample readable
+                        }
+                    }                    
                 }
             }
 
