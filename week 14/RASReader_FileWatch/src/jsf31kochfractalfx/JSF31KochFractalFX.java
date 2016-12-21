@@ -82,8 +82,8 @@ public class JSF31KochFractalFX extends Application {
     private final int kpWidth = 500;
     private final int kpHeight = 500;
     
-    private final static String DIRPATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 14\\edges\\";
-    private final static String FILEPATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 14\\edges\\edges.bin";
+    private final static String DIRPATH = "C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\";
+    private final static String FILEPATH = "C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges.bin";
     private final static int INTBYTESIZE = 4;
     private final static int EDGEBYTESIZE = 56;
     private WatchDirRunnable thread;

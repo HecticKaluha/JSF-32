@@ -19,10 +19,12 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sun.security.jca.GetInstance;
 import timeutil.TimeStamp;
 
 /**
@@ -31,7 +33,7 @@ import timeutil.TimeStamp;
  */
 public class Writer
 {    
-    private static final String FILEPATH = "C:\\Users\\Stefan\\Documents\\GitHub\\JSF-32\\week 14\\edges\\edges.bin";
+    private static String FILEPATH = "C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges.bin";
     private static final int EDGEBYTESIZE = 56;
     private static final int INTBYTESIZE = 4;
     
@@ -56,7 +58,8 @@ public class Writer
             edges.addAll(kochFractal.generateLeftEdge());
             edges.addAll(kochFractal.generateRightEdge());
             
-            raf = new RandomAccessFile(new File(FILEPATH), "rw");
+            File file = new File(FILEPATH);
+            raf = new RandomAccessFile(file, "rw");
             ch = raf.getChannel();
 
             out = ch.map(FileChannel.MapMode.READ_WRITE, 0, INTBYTESIZE + (kochFractal.getNrOfEdges() * EDGEBYTESIZE));
@@ -85,6 +88,8 @@ public class Writer
                 
                 exclusiveLock.release();
             }
+            
+            file.renameTo(new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + new GregorianCalendar().getInstance().toString() + ".bin"));
                 
             timeStampWrite.setEnd();
             System.out.println(timeStampWrite.toString());            
@@ -106,7 +111,7 @@ public class Writer
                ch.close();
                raf.close();
             } catch (Exception ex) {
-                Logger.getLogger(Writer.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(Writer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

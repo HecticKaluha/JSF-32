@@ -6,6 +6,8 @@ import static java.nio.file.LinkOption.*;
 import java.nio.file.attribute.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import jsf31kochfractalfx.JSF31KochFractalFX;
@@ -102,12 +104,16 @@ public class WatchDirRunnable implements Runnable {
         {
 
             // wait for key to be signalled
-            WatchKey key;
-//            try {
-                key = watcher.poll();
+            WatchKey key =null;
+            try {
+                //            try {
+                key = watcher.take();
 //            } catch (InterruptedException x) {
 //                return;
 //            }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(WatchDirRunnable.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             Path dir = keys.get(key);
             if (dir == null) {
