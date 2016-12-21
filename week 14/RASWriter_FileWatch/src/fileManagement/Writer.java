@@ -18,12 +18,15 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sun.misc.Cleaner;
 import sun.security.jca.GetInstance;
 import timeutil.TimeStamp;
 
@@ -45,6 +48,8 @@ public class Writer
         RandomAccessFile raf = null;
         FileChannel ch = null;
         
+        File file = new File(FILEPATH);
+        
         try
         {
             List<Edge> edges = new ArrayList<>();
@@ -58,7 +63,6 @@ public class Writer
             edges.addAll(kochFractal.generateLeftEdge());
             edges.addAll(kochFractal.generateRightEdge());
             
-            File file = new File(FILEPATH);
             raf = new RandomAccessFile(file, "rw");
             ch = raf.getChannel();
 
@@ -88,9 +92,9 @@ public class Writer
                 
                 exclusiveLock.release();
             }
-            
-            file.renameTo(new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + new GregorianCalendar().getInstance().toString() + ".bin"));
-                
+            GregorianCalendar calendar = new GregorianCalendar();
+            //file.renameTo(new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + "BLUB" + ".bin"));
+
             timeStampWrite.setEnd();
             System.out.println(timeStampWrite.toString());            
         }
@@ -103,15 +107,20 @@ public class Writer
         {
             try
             {
-               if(exclusiveLock != null)
-               {
-                   exclusiveLock.release();
-               }
-               
-               ch.close();
-               raf.close();
+                if(exclusiveLock != null)
+                {
+                    exclusiveLock.release();
+                }
+                
+                ch.close();
+                raf.close();
+                Cleaner cleaner = ((sun.nio.ch.DirectBuffer)out).cleaner();
+                cleaner.clean();
+                File file2 = new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + "BLUB" + ".bin");
+                System.out.println("Result of move:"+ file.renameTo(file2));
+               //Files.move(file.toPath(), new File("C:\\Users\\Milton van de Sanden\\Documents\\GitHub\\JSF-32\\week 14\\RASReader_FileWatch\\edges" + "BLUB" + ".bin").toPath());
             } catch (Exception ex) {
-                //Logger.getLogger(Writer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Writer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
